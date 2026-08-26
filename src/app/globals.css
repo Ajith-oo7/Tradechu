@@ -1,0 +1,254 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0f172a;
+  --foreground: #f8fafc;
+  --card: #ffffff;
+  --pikachu: #ffcb05;
+  --pokeball: #ee1515;
+  --slate-deep: #0f172a;
+  --glass: rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-pikachu: var(--pikachu);
+  --color-pokeball: var(--pokeball);
+  --color-slate-deep: var(--slate-deep);
+  --color-card: var(--card);
+  --color-glass: var(--glass);
+  --color-glass-border: var(--glass-border);
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, monospace;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  overscroll-behavior: none;
+}
+
+.glass {
+  background: var(--glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+}
+
+.glass-card {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.gradient-mesh {
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(255, 203, 5, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(238, 21, 21, 0.08) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 100%, rgba(99, 102, 241, 0.06) 0%, transparent 50%),
+    #0f172a;
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.pt-safe {
+  padding-top: max(env(safe-area-inset-top, 0px), 12px);
+}
+
+.pb-safe {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 16px);
+}
+
+/* Digital binder — semi-transparent so background animation shows through */
+.binder-page {
+  background: linear-gradient(
+    165deg,
+    rgba(30, 36, 51, 0.82) 0%,
+    rgba(20, 27, 40, 0.88) 40%,
+    rgba(15, 23, 42, 0.9) 100%
+  );
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    inset 0 2px 20px rgba(0, 0, 0, 0.35),
+    0 8px 32px rgba(0, 0, 0, 0.45);
+}
+
+.binder-holes {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.binder-hole {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #2a3344, #0a0e14);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.binder-inner {
+  min-height: 60vh;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 8px,
+      rgba(255, 255, 255, 0.015) 8px,
+      rgba(255, 255, 255, 0.015) 9px
+    );
+}
+
+.binder-segmented {
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.binder-slot {
+  position: relative;
+}
+
+.binder-pocket {
+  background: rgba(0, 0, 0, 0.25);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    inset 0 -4px 12px rgba(0, 0, 0, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.binder-add-slot {
+  min-height: 140px;
+}
+
+.active\:scale-98:active {
+  transform: scale(0.98);
+}
+
+.mobile-shell {
+  max-width: 430px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(255, 203, 5, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 203, 5, 0.8);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 25%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.04) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes glitter-drift {
+  0% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(18px, -22px);
+  }
+  40% {
+    transform: translate(-14px, -32px);
+  }
+  60% {
+    transform: translate(-20px, 12px);
+  }
+  80% {
+    transform: translate(16px, 18px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes glitter-twinkle {
+  0%, 100% {
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.glitter-particle {
+  position: absolute;
+  pointer-events: none;
+  animation: glitter-drift ease-in-out infinite;
+}
+
+.glitter-particle-inner {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  animation: glitter-twinkle ease-in-out infinite;
+}
