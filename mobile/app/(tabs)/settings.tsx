@@ -1,17 +1,17 @@
-import { Alert, Text, View } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
+import { router } from "expo-router";
 import { Screen, PrimaryButton, SecondaryButton, Subtitle, Title } from "../../components/ui";
 import { useAuth } from "../../providers/AuthProvider";
 import { useApp } from "../../providers/AppProvider";
-import { colors } from "../../constants/Colors";
+import { colors, fonts } from "../../constants/Colors";
 import {
   ensureNotificationPermissions,
   notifyLocal,
   registerForPushAsync,
 } from "../../lib/notifications";
-import { router } from "expo-router";
 
 export default function SettingsScreen() {
-  const { profile, signOut, backendOnline } = useAuth();
+  const { profile, signOut } = useAuth();
   const { quietHours, setQuietHours, wishlist, tradeBinder } = useApp();
 
   return (
@@ -22,18 +22,16 @@ export default function SettingsScreen() {
         {"\n"}@{profile?.username} · {profile?.phone}
       </Subtitle>
 
-      <View style={card}>
-        <Text style={label}>Collection</Text>
-        <Text style={value}>
+      <View style={styles.card}>
+        <Text style={styles.label}>Collection</Text>
+        <Text style={styles.value}>
           {wishlist.length} wishlist · {tradeBinder.length} binder
         </Text>
       </View>
 
-      <View style={card}>
-        <Text style={label}>Backend</Text>
-        <Text style={value}>
-          {backendOnline ? "Supabase connected" : "Local demo (set EXPO_PUBLIC_SUPABASE_*)"}
-        </Text>
+      <View style={styles.card}>
+        <Text style={styles.label}>Session</Text>
+        <Text style={styles.value}>Local demo (on-device only)</Text>
       </View>
 
       <PrimaryButton
@@ -61,9 +59,7 @@ export default function SettingsScreen() {
 
       <SecondaryButton
         label="Test open-trade reminder"
-        onPress={() =>
-          void notifyLocal("Trade still open?", "Trade with @TrainerY still open?")
-        }
+        onPress={() => void notifyLocal("Trade still open?", "Trade with @TrainerY still open?")}
       />
 
       <SecondaryButton
@@ -77,13 +73,19 @@ export default function SettingsScreen() {
   );
 }
 
-const card = {
-  backgroundColor: colors.glass,
-  borderRadius: 14,
-  padding: 14,
-  marginBottom: 10,
-  borderWidth: 1,
-  borderColor: colors.border,
-};
-const label = { color: colors.muted, fontSize: 11, fontWeight: "700" as const };
-const value = { color: colors.white, fontWeight: "700" as const, marginTop: 4 };
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: colors.surface,
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  label: { color: colors.muted, fontSize: 11, fontFamily: fonts.label },
+  value: {
+    color: colors.onSurface,
+    fontFamily: fonts.bodyBold,
+    marginTop: 4,
+  },
+});

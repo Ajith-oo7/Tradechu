@@ -12,26 +12,12 @@ npx expo start
 
 Scan the QR code with **Expo Go** (Android) or the Camera app (iOS).
 
-## Auth (OTP)
+## Auth (local demo)
 
-Login collects **first name**, **last name**, and **phone number**, then SMS OTP via Supabase Phone Auth (Twilio).
+Login collects **first name**, **last name**, and **phone number**. Sessions are stored on-device (AsyncStorage).
 
-Without Supabase configured:
 - Tap **Continue in demo mode**, or
 - Send code and enter **123456**
-
-## Env
-
-Copy `.env.example` → `.env` and set:
-
-- `EXPO_PUBLIC_SUPABASE_URL`
-- `EXPO_PUBLIC_SUPABASE_ANON_KEY`
-
-Enable **Phone** provider in Supabase Auth and connect Twilio.
-
-## SQL
-
-Run root `supabase/schema.sql`, then `supabase/profiles_phone.sql` for first/last/phone columns.
 
 ## EAS builds
 

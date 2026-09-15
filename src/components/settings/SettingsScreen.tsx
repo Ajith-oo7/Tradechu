@@ -30,7 +30,6 @@ export function SettingsScreen() {
     quietHours,
     setQuietHours,
     userId,
-    backendOnline,
     clearWishlist,
     clearBinder,
   } = useApp();
@@ -123,7 +122,7 @@ export function SettingsScreen() {
             <SettingsRow icon={Shield} label="Privacy" />
           </div>
           <p className="text-[10px] text-white/30 mt-2 px-1">
-            Backend: {backendOnline ? "Supabase connected" : "local mode (add keys in .env)"}
+            Backend: local demo (on-device only)
           </p>
         </section>
 

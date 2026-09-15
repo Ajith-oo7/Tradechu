@@ -101,10 +101,10 @@ export function ParticleField({
         duration: 1800 + seeded(i, 6) * 2400,
         travel: 12 + seeded(i, 7) * (intensity === "high" ? 40 : 24),
         color: gold
-          ? colors.pikachu
+          ? colors.tertiaryBright
           : seeded(i, 8) > 0.5
-            ? "rgba(255,255,255,0.95)"
-            : "rgba(255,220,150,0.9)",
+            ? "rgba(188,0,7,0.55)"
+            : "rgba(27,91,184,0.35)",
       };
     });
   }, [density, intensity]);

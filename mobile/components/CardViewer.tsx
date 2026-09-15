@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { CARD_CONDITIONS } from "../lib/conditions";
 import type { CardCondition, PokemonCard } from "../lib/types";
-import { colors } from "../constants/Colors";
+import { colors, fonts } from "../constants/Colors";
 import { PrimaryButton, SecondaryButton } from "./ui";
 
 interface CardViewerProps {
@@ -35,7 +35,7 @@ export function CardViewer({ card, onClose, onSave, onRemove }: CardViewerProps)
         <View style={styles.sheet}>
           <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
             <View style={styles.header}>
-              <Text style={styles.headerTitle}>Card</Text>
+              <Text style={styles.headerTitle}>Edit Card</Text>
               <Pressable onPress={onClose} hitSlop={12}>
                 <Text style={styles.close}>Close</Text>
               </Pressable>
@@ -116,14 +116,14 @@ export function CardViewer({ card, onClose, onSave, onRemove }: CardViewerProps)
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.65)",
+    backgroundColor: "rgba(27,28,28,0.45)",
     justifyContent: "flex-end",
   },
   sheet: {
     maxHeight: "92%",
-    backgroundColor: colors.slateCard,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    backgroundColor: colors.surface,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
     paddingHorizontal: 16,
     paddingTop: 16,
     borderWidth: 1,
@@ -135,57 +135,54 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 12,
   },
-  headerTitle: { color: colors.white, fontWeight: "900", fontSize: 18 },
-  close: { color: colors.muted, fontWeight: "700" },
-  artWrap: {
-    alignItems: "center",
-    marginBottom: 12,
+  headerTitle: {
+    color: colors.onSurface,
+    fontFamily: fonts.headlineExtra,
+    fontSize: 18,
   },
-  art: {
-    width: "70%",
-    aspectRatio: 3 / 4,
-    borderRadius: 12,
-  },
+  close: { color: colors.muted, fontFamily: fonts.label },
+  artWrap: { alignItems: "center", marginBottom: 12 },
+  art: { width: "70%", aspectRatio: 3 / 4, borderRadius: 12 },
   artFallback: {
-    backgroundColor: colors.slateDeep,
+    backgroundColor: colors.surfaceContainer,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
     borderColor: colors.border,
   },
-  artLetter: { color: colors.pikachu, fontWeight: "900", fontSize: 48 },
+  artLetter: {
+    color: colors.primary,
+    fontFamily: fonts.headlineExtra,
+    fontSize: 48,
+  },
   meta: {
     color: colors.muted,
     fontSize: 12,
     textAlign: "center",
     marginBottom: 12,
+    fontFamily: fonts.body,
   },
   label: {
     color: colors.muted,
     fontSize: 11,
-    fontWeight: "700",
+    fontFamily: fonts.label,
     textTransform: "uppercase",
     marginBottom: 6,
     marginTop: 4,
   },
   input: {
-    backgroundColor: "rgba(255,255,255,0.08)",
+    backgroundColor: colors.surfaceContainer,
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: 14,
     paddingHorizontal: 14,
     paddingVertical: 12,
-    color: colors.white,
+    color: colors.onSurface,
     fontSize: 16,
-    fontWeight: "600",
+    fontFamily: fonts.bodyBold,
     marginBottom: 10,
   },
-  condGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-    marginBottom: 12,
-  },
+  condGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginBottom: 12 },
   condChip: {
     width: "31%",
     borderRadius: 12,
@@ -193,19 +190,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     borderWidth: 1,
     borderColor: colors.border,
-    backgroundColor: "rgba(255,255,255,0.05)",
+    backgroundColor: colors.surfaceLow,
   },
   condChipActive: {
-    borderColor: "rgba(255,203,5,0.5)",
-    backgroundColor: "rgba(255,203,5,0.15)",
+    borderColor: "rgba(188,0,7,0.45)",
+    backgroundColor: "rgba(188,0,7,0.1)",
   },
   condText: {
     color: colors.muted,
     fontSize: 11,
-    fontWeight: "700",
+    fontFamily: fonts.label,
     textAlign: "center",
   },
-  condTextActive: { color: colors.pikachu },
+  condTextActive: { color: colors.primary },
   counter: {
     color: colors.muted2,
     fontSize: 10,

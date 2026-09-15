@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { CheckCircle2, Radio, Users } from "lucide-react";
@@ -11,8 +11,6 @@ import { CardViewerModal } from "@/components/binder/CardViewerModal";
 import { useApp } from "@/providers/AppProvider";
 import { getEventById } from "@/lib/events";
 import { computeTradeOpportunities, otherUsers } from "@/data/mock";
-import { fetchConfirmedAttendeeCards } from "@/lib/supabase/api";
-import { getSupabase, isSupabaseConfigured } from "@/lib/supabase/client";
 import type { PokemonCard, PokemonEvent, TradeOpportunity, User } from "@/types";
 
 export default function EventTradesPage() {
@@ -27,13 +25,10 @@ export default function EventTradesPage() {
     tradeBinder,
     attendance,
     userId,
-    backendOnline,
   } = useApp();
 
   const [event, setEvent] = useState<PokemonEvent | null | undefined>(undefined);
   const [viewingCard, setViewingCard] = useState<PokemonCard | null>(null);
-  const [liveOthers, setLiveOthers] = useState<User[] | null>(null);
-  const [liveLabel, setLiveLabel] = useState("Matching traders…");
 
   useEffect(() => {
     setEvent(getEventById(eventId) ?? null);
@@ -45,56 +40,6 @@ export default function EventTradesPage() {
       router.replace(event ? `/events/${event.id}` : "/events");
     }
   }, [event, attendance, router]);
-
-  const refreshLive = useCallback(async () => {
-    if (!backendOnline || !userId || !isSupabaseConfigured()) {
-      setLiveOthers(null);
-      setLiveLabel("Demo matches (connect Supabase for live attendees)");
-      return;
-    }
-    const rows = await fetchConfirmedAttendeeCards(eventId, userId);
-    setLiveOthers(
-      rows.map((r) => ({
-        id: r.userId,
-        username: r.username,
-        avatar: r.avatar,
-        avatarGradient: r.avatarGradient,
-        wishlist: r.wishlist,
-        tradeBinder: r.tradeBinder,
-      }))
-    );
-    setLiveLabel(
-      rows.length
-        ? `${rows.length} collector${rows.length === 1 ? "" : "s"} checked in live`
-        : "Waiting for other collectors to check in…"
-    );
-  }, [backendOnline, userId, eventId]);
-
-  useEffect(() => {
-    void refreshLive();
-    if (!backendOnline || !isSupabaseConfigured()) return;
-
-    const sb = getSupabase();
-    if (!sb) return;
-
-    const channel = sb
-      .channel(`event:${eventId}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "event_rsvps", filter: `event_id=eq.${eventId}` },
-        () => {
-          void refreshLive();
-        }
-      )
-      .subscribe();
-
-    // Presence heartbeat while on this screen
-    channel.track({ userId, username, at: Date.now() });
-
-    return () => {
-      void sb.removeChannel(channel);
-    };
-  }, [backendOnline, eventId, refreshLive, userId, username]);
 
   const me: User = useMemo(
     () => ({
@@ -108,10 +53,10 @@ export default function EventTradesPage() {
     [userId, username, avatar, avatarGradient, wishlist, tradeBinder]
   );
 
-  const opportunities: TradeOpportunity[] = useMemo(() => {
-    const others = liveOthers ?? otherUsers;
-    return computeTradeOpportunities(me, others);
-  }, [me, liveOthers]);
+  const opportunities: TradeOpportunity[] = useMemo(
+    () => computeTradeOpportunities(me, otherUsers),
+    [me]
+  );
 
   if (event === undefined || attendance[eventId] !== "confirmed") {
     return (
@@ -154,7 +99,7 @@ export default function EventTradesPage() {
               <p className="font-bold text-sm mt-0.5 leading-tight">{event.title}</p>
               <p className="text-xs text-white/45 mt-1 flex items-center gap-1.5">
                 <Radio size={12} className="text-pikachu" />
-                {liveLabel}
+                Demo matches (local only)
               </p>
             </div>
           </div>

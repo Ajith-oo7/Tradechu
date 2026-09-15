@@ -21,14 +21,6 @@ import type {
 import { currentUser as initialUser, recentActivity as initialActivity } from "@/data/mock";
 import { createCard, createCardFromApi, gradientForName } from "@/lib/cardUtils";
 import type { ApiCard } from "@/lib/pokemonTcg";
-import { isSupabaseConfigured } from "@/lib/supabase/client";
-import {
-  deleteCardFromBackend,
-  deleteRsvp,
-  ensureAnonSession,
-  syncCardToBackend,
-  upsertRsvp,
-} from "@/lib/supabase/api";
 import type { CardEditPatch } from "@/components/binder/EditCardSheet";
 
 interface AppState {
@@ -42,7 +34,6 @@ interface AppState {
   darkMode: boolean;
   quietHours: boolean;
   userId: string | null;
-  backendOnline: boolean;
 }
 
 const ATTENDANCE_KEY = "tradechu.attendance.v1";
@@ -84,10 +75,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     darkMode: true,
     quietHours: false,
     userId: null,
-    backendOnline: false,
   });
 
-  const userIdRef = useRef<string | null>(null);
   const [attendance, setAttendance] = useState<Record<string, AttendanceStatus>>({});
   const attendanceLoaded = useRef(false);
 
@@ -95,7 +84,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     void ensureCardIndex();
   }, []);
 
-  // Restore local cards / quiet hours / attendance, then optional Supabase session.
+  // Restore local cards / quiet hours / attendance.
   useEffect(() => {
     try {
       const raw = localStorage.getItem(ATTENDANCE_KEY);
@@ -118,15 +107,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       // ignore
     }
     attendanceLoaded.current = true;
-
-    if (isSupabaseConfigured()) {
-      void ensureAnonSession(initialUser.username).then((id) => {
-        if (id) {
-          userIdRef.current = id;
-          setState((s) => ({ ...s, userId: id, backendOnline: true }));
-        }
-      });
-    }
   }, []);
 
   useEffect(() => {
@@ -149,9 +129,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [state.wishlist, state.tradeBinder]);
 
-  const persistCard = useCallback((card: PokemonCard, list: CardListType) => {
-    const uid = userIdRef.current;
-    if (uid) void syncCardToBackend(uid, card, list);
+  const persistCard = useCallback((_card: PokemonCard, _list: CardListType) => {
+    // Local-only — cards persist via localStorage effect above.
   }, []);
 
   const addActivity = useCallback((text: string, type: ActivityItem["type"]) => {
@@ -181,7 +160,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       wishlist: s.wishlist.filter((c) => c.id !== id),
       stats: { ...s.stats, wishlistCount: Math.max(0, s.wishlist.length - 1) },
     }));
-    void deleteCardFromBackend(id);
   }, []);
 
   const addToBinder = useCallback(
@@ -204,7 +182,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       tradeBinder: s.tradeBinder.filter((c) => c.id !== id),
       stats: { ...s.stats, binderCount: Math.max(0, s.tradeBinder.length - 1) },
     }));
-    void deleteCardFromBackend(id);
   }, []);
 
   const addCardFromCamera = useCallback(
@@ -284,8 +261,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
           binderCount: Math.max(0, s.tradeBinder.length - 1),
         },
       }));
-      void deleteCardFromBackend(wishlistCardId);
-      void deleteCardFromBackend(binderCardId);
       addActivity("Completed a trade", "trade");
     },
     [addActivity]
@@ -295,8 +270,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     (eventId: string, eventTitle: string) => {
       setAttendance((a) => ({ ...a, [eventId]: "going" }));
       addActivity(`RSVP — attending ${eventTitle}`, "event");
-      const uid = userIdRef.current;
-      if (uid) void upsertRsvp(uid, eventId, "going");
       try {
         const raw = sessionStorage.getItem("tradechu.attendedThisSession");
         const ids: string[] = raw ? JSON.parse(raw) : [];
@@ -317,16 +290,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
       delete next[eventId];
       return next;
     });
-    const uid = userIdRef.current;
-    if (uid) void deleteRsvp(uid, eventId);
   }, []);
 
   const confirmAttendance = useCallback(
     (eventId: string) => {
       setAttendance((a) => ({ ...a, [eventId]: "confirmed" }));
       addActivity("Checked in at an event — finding traders", "event");
-      const uid = userIdRef.current;
-      if (uid) void upsertRsvp(uid, eventId, "confirmed");
     },
     [addActivity]
   );
@@ -345,17 +314,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const clearWishlist = useCallback(() => {
-    setState((s) => {
-      s.wishlist.forEach((c) => void deleteCardFromBackend(c.id));
-      return { ...s, wishlist: [], stats: { ...s.stats, wishlistCount: 0 } };
-    });
+    setState((s) => ({
+      ...s,
+      wishlist: [],
+      stats: { ...s.stats, wishlistCount: 0 },
+    }));
   }, []);
 
   const clearBinder = useCallback(() => {
-    setState((s) => {
-      s.tradeBinder.forEach((c) => void deleteCardFromBackend(c.id));
-      return { ...s, tradeBinder: [], stats: { ...s.stats, binderCount: 0 } };
-    });
+    setState((s) => ({
+      ...s,
+      tradeBinder: [],
+      stats: { ...s.stats, binderCount: 0 },
+    }));
   }, []);
 
   return (

@@ -64,7 +64,7 @@ export default function ScanScreen() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.slateDeep }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       <CameraView ref={cameraRef} style={{ flex: 1 }} facing="back" />
       <View style={styles.controls}>
         <PrimaryButton label="Capture" onPress={() => void capture()} />
@@ -84,6 +84,6 @@ const styles = StyleSheet.create({
   controls: {
     padding: 16,
     gap: 4,
-    backgroundColor: colors.slateDeep,
+    backgroundColor: colors.background,
   },
 });

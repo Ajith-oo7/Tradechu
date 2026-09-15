@@ -1,5 +1,3 @@
-import { savePushSubscription } from "@/lib/supabase/api";
-
 const VAPID_PUBLIC = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? "";
 
 export function pushSupported(): boolean {
@@ -23,11 +21,10 @@ export async function registerTradechuServiceWorker(): Promise<ServiceWorkerRegi
 
 /**
  * Ask for notification permission after a meaningful action (RSVP / check-in).
- * Respects quiet hours: still stores the subscription but callers should skip
- * local demo notifications when quietHours is on.
+ * Respects quiet hours: callers should skip local demo notifications when quietHours is on.
  */
 export async function enablePushNotifications(
-  userId: string | null,
+  _userId: string | null,
   quietHours: boolean
 ): Promise<boolean> {
   if (!pushSupported()) return false;
@@ -41,11 +38,10 @@ export async function enablePushNotifications(
 
   if (VAPID_PUBLIC) {
     try {
-      const sub = await reg.pushManager.subscribe({
+      await reg.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC),
       });
-      if (userId) await savePushSubscription(userId, sub.toJSON());
     } catch (e) {
       console.warn("[push] subscribe failed", e);
     }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Alert, ScrollView, Text, View } from "react-native";
+import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import * as Location from "expo-location";
 import { PrimaryButton, SecondaryButton, Subtitle } from "../../../components/ui";
@@ -12,7 +12,7 @@ import {
 } from "../../../lib/events";
 import type { PokemonEvent } from "../../../lib/types";
 import { useApp } from "../../../providers/AppProvider";
-import { colors } from "../../../constants/Colors";
+import { colors, fonts } from "../../../constants/Colors";
 import {
   ensureNotificationPermissions,
   notifyLocal,
@@ -30,8 +30,8 @@ export default function EventDetailScreen() {
 
   if (!event) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.slateDeep, padding: 16 }}>
-        <Text style={{ color: colors.muted }}>Loading…</Text>
+      <View style={styles.root}>
+        <Text style={styles.muted}>Loading…</Text>
       </View>
     );
   }
@@ -80,18 +80,13 @@ export default function EventDetailScreen() {
   };
 
   return (
-    <ScrollView
-      style={{ flex: 1, backgroundColor: colors.slateDeep }}
-      contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
-    >
+    <ScrollView style={styles.root} contentContainerStyle={styles.content}>
       <Stack.Screen options={{ title: "Event" }} />
-      <Text style={{ color: colors.pikachu, fontWeight: "800", fontSize: 12 }}>
+      <Text style={styles.eyebrow}>
         {event.category} · {formatEventDate(event.date)}
       </Text>
-      <Text style={{ color: colors.white, fontWeight: "900", fontSize: 22, marginTop: 6 }}>
-        {event.title}
-      </Text>
-      <Text style={{ color: colors.muted, marginTop: 8 }}>
+      <Text style={styles.title}>{event.title}</Text>
+      <Text style={styles.meta}>
         {event.venue}
         {"\n"}
         {event.address} · {event.distanceMiles.toFixed(1)} mi{"\n"}
@@ -100,12 +95,9 @@ export default function EventDetailScreen() {
       <Subtitle>{event.description}</Subtitle>
 
       {event.details.map((d) => (
-        <View
-          key={d.label}
-          style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 8 }}
-        >
-          <Text style={{ color: colors.muted }}>{d.label}</Text>
-          <Text style={{ color: colors.white, fontWeight: "700" }}>{d.value}</Text>
+        <View key={d.label} style={styles.detailRow}>
+          <Text style={styles.muted}>{d.label}</Text>
+          <Text style={styles.detailValue}>{d.value}</Text>
         </View>
       ))}
 
@@ -120,9 +112,7 @@ export default function EventDetailScreen() {
           </>
         ) : status === "going" ? (
           <>
-            <Text style={{ color: colors.success, fontWeight: "700", marginBottom: 8 }}>
-              RSVP saved — check in when you’re within 1 mile
-            </Text>
+            <Text style={styles.ok}>RSVP saved — check in when you’re within 1 mile</Text>
             <PrimaryButton label="I'm here — check in" onPress={() => void tryCheckIn()} />
             <SecondaryButton label="Simulate nearby (demo)" onPress={() => void simulateNearby()} />
             <SecondaryButton label="Cancel RSVP" onPress={() => cancelAttendance(event.id)} />
@@ -136,9 +126,9 @@ export default function EventDetailScreen() {
                 void ensureNotificationPermissions();
               }}
             />
-            <Text style={{ color: colors.muted2, fontSize: 11, textAlign: "center", marginTop: 10 }}>
-              RSVP (Répondez s’il vous plaît) means please respond — you will attend. Check in within 1
-              mile to start matching.
+            <Text style={styles.hint}>
+              RSVP (Répondez s’il vous plaît) means please respond — you will attend. Check in within
+              1 mile to start matching.
             </Text>
           </>
         )}
@@ -146,3 +136,47 @@ export default function EventDetailScreen() {
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  root: { flex: 1, backgroundColor: colors.background },
+  content: { padding: 16, paddingBottom: 40 },
+  muted: { color: colors.muted, fontFamily: fonts.body },
+  eyebrow: {
+    color: colors.primary,
+    fontFamily: fonts.label,
+    fontSize: 12,
+  },
+  title: {
+    color: colors.onSurface,
+    fontFamily: fonts.headlineExtra,
+    fontSize: 22,
+    marginTop: 6,
+  },
+  meta: {
+    color: colors.muted,
+    marginTop: 8,
+    fontFamily: fonts.body,
+    lineHeight: 20,
+  },
+  detailRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+  detailValue: {
+    color: colors.onSurface,
+    fontFamily: fonts.bodyBold,
+  },
+  ok: {
+    color: colors.success,
+    fontFamily: fonts.bodyBold,
+    marginBottom: 8,
+  },
+  hint: {
+    color: colors.muted2,
+    fontSize: 11,
+    textAlign: "center",
+    marginTop: 10,
+    fontFamily: fonts.body,
+  },
+});

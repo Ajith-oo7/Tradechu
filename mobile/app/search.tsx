@@ -47,7 +47,7 @@ export default function SearchScreen() {
         onChangeText={setQuery}
         autoFocus
       />
-      {loading ? <ActivityIndicator color={colors.pikachu} /> : null}
+      {loading ? <ActivityIndicator color={colors.primary} /> : null}
       <FlatList
         data={results}
         keyExtractor={(c) => c.id}
@@ -63,9 +63,22 @@ export default function SearchScreen() {
           >
             <Image
               source={{ uri: item.imageSmall }}
-              style={{ width: "100%", aspectRatio: 3 / 4, borderRadius: 10 }}
+              style={{
+                width: "100%",
+                aspectRatio: 3 / 4,
+                borderRadius: 10,
+                backgroundColor: colors.surfaceContainer,
+              }}
             />
-            <Text numberOfLines={1} style={{ color: colors.white, fontWeight: "700", fontSize: 11, marginTop: 4 }}>
+            <Text
+              numberOfLines={1}
+              style={{
+                color: colors.onSurface,
+                fontWeight: "700",
+                fontSize: 11,
+                marginTop: 4,
+              }}
+            >
               {item.name}
             </Text>
             <Text numberOfLines={1} style={{ color: colors.muted2, fontSize: 10 }}>

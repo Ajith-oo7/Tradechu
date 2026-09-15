@@ -6,19 +6,52 @@ import {
   TextInput,
   View,
   type TextInputProps,
+  type StyleProp,
+  type ViewStyle,
 } from "react-native";
-import { colors } from "../constants/Colors";
+import { LinearGradient } from "expo-linear-gradient";
+import { colors, fonts } from "../constants/Colors";
 
-export function Screen({ children }: { children: React.ReactNode }) {
-  return <View style={styles.screen}>{children}</View>;
+export function Screen({
+  children,
+  style,
+}: {
+  children: React.ReactNode;
+  style?: StyleProp<ViewStyle>;
+}) {
+  return <View style={[styles.screen, style]}>{children}</View>;
 }
 
-export function Title({ children }: { children: React.ReactNode }) {
-  return <Text style={styles.title}>{children}</Text>;
+export function GlassPanel({
+  children,
+  style,
+}: {
+  children: React.ReactNode;
+  style?: StyleProp<ViewStyle>;
+}) {
+  return <View style={[styles.glass, style]}>{children}</View>;
 }
 
-export function Subtitle({ children }: { children: React.ReactNode }) {
-  return <Text style={styles.subtitle}>{children}</Text>;
+export function Title({
+  children,
+  centered = false,
+}: {
+  children: React.ReactNode;
+  centered?: boolean;
+}) {
+  return <Text style={[styles.title, centered && { textAlign: "center" }]}>{children}</Text>;
+}
+
+export function Subtitle({
+  children,
+  centered = false,
+}: {
+  children: React.ReactNode;
+  centered?: boolean;
+}) {
+  return (
+    <Text style={[styles.subtitle, centered && { textAlign: "center" }]}>{children}</Text>
+  );
 }
 
 export function Field(props: TextInputProps) {
@@ -47,16 +80,22 @@ export function PrimaryButton({
       onPress={onPress}
       disabled={disabled || loading}
       style={({ pressed }) => [
-        styles.primaryBtn,
         (disabled || loading) && { opacity: 0.5 },
         pressed && { transform: [{ scale: 0.98 }] },
       ]}
     >
-      {loading ? (
-        <ActivityIndicator color={colors.slateDeep} />
-      ) : (
-        <Text style={styles.primaryLabel}>{label}</Text>
-      )}
+      <LinearGradient
+        colors={[colors.primaryBright, colors.primary]}
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
+        style={styles.primaryBtn}
+      >
+        {loading ? (
+          <ActivityIndicator color={colors.onPrimary} />
+        ) : (
+          <Text style={styles.primaryLabel}>{label}</Text>
+        )}
+      </LinearGradient>
     </Pressable>
   );
 }
@@ -75,38 +114,19 @@ export function SecondaryButton({
   );
 }
 
-export function CardTile({
-  name,
-  setName,
-  condition,
-  imageUrl,
+export function BlueButton({
+  label,
   onPress,
 }: {
-  name: string;
-  setName?: string;
-  condition?: string;
-  imageUrl?: string;
-  onPress?: () => void;
+  label: string;
+  onPress: () => void;
 }) {
   return (
-    <Pressable onPress={onPress} style={styles.cardTile}>
-      <View style={styles.cardArt}>
-        {imageUrl ? (
-          // eslint-disable-next-line @typescript-eslint/no-require-imports
-          <Text style={styles.cardArtPlaceholder}>IMG</Text>
-        ) : (
-          <Text style={styles.cardArtPlaceholder}>{name.slice(0, 1)}</Text>
-        )}
-      </View>
-      <Text numberOfLines={2} style={styles.cardName}>
-        {name}
-      </Text>
-      {setName ? (
-        <Text numberOfLines={1} style={styles.cardMeta}>
-          {setName}
-        </Text>
-      ) : null}
-      {condition ? <Text style={styles.cardCond}>{condition}</Text> : null}
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [styles.blueBtn, pressed && { opacity: 0.9 }]}
+    >
+      <Text style={styles.blueLabel}>{label}</Text>
     </Pressable>
   );
 }
@@ -114,44 +134,61 @@ export function CardTile({
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: colors.slateDeep,
-    paddingHorizontal: 16,
+    backgroundColor: colors.background,
+    paddingHorizontal: 20,
     paddingTop: 8,
   },
+  glass: {
+    backgroundColor: colors.glass,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+    padding: 16,
+    shadowColor: "#1b1c1c",
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 4,
+  },
   title: {
-    color: colors.white,
-    fontSize: 24,
-    fontWeight: "900",
+    color: colors.onSurface,
+    fontSize: 26,
+    fontFamily: fonts.headlineExtra,
     marginBottom: 6,
   },
   subtitle: {
     color: colors.muted,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 15,
+    lineHeight: 22,
+    fontFamily: fonts.body,
     marginBottom: 16,
   },
   input: {
-    backgroundColor: "rgba(255,255,255,0.08)",
+    backgroundColor: colors.surfaceContainer,
     borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 14,
-    paddingHorizontal: 14,
+    borderColor: "transparent",
+    borderRadius: 999,
+    paddingHorizontal: 18,
     paddingVertical: 14,
-    color: colors.white,
+    color: colors.onSurface,
     fontSize: 16,
-    fontWeight: "600",
+    fontFamily: fonts.bodyBold,
     marginBottom: 12,
   },
   primaryBtn: {
-    backgroundColor: colors.pikachu,
-    borderRadius: 16,
+    borderRadius: 999,
     paddingVertical: 16,
     alignItems: "center",
     marginTop: 8,
+    shadowColor: colors.primary,
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 6,
   },
   primaryLabel: {
-    color: colors.slateDeep,
-    fontWeight: "800",
+    color: colors.onPrimary,
+    fontFamily: fonts.headline,
     fontSize: 16,
   },
   secondaryBtn: {
@@ -160,44 +197,19 @@ const styles = StyleSheet.create({
   },
   secondaryLabel: {
     color: colors.muted,
-    fontWeight: "600",
+    fontFamily: fonts.bodyBold,
     fontSize: 14,
   },
-  cardTile: {
-    width: "47%",
-    marginBottom: 14,
-  },
-  cardArt: {
-    aspectRatio: 3 / 4,
-    borderRadius: 12,
-    backgroundColor: colors.slateCard,
+  blueBtn: {
+    backgroundColor: colors.secondary,
+    borderRadius: 999,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
     alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: colors.border,
   },
-  cardArtPlaceholder: {
-    color: colors.pikachu,
-    fontWeight: "900",
-    fontSize: 28,
-  },
-  cardName: {
-    color: colors.white,
-    fontSize: 12,
-    fontWeight: "700",
-    marginTop: 6,
-    textAlign: "center",
-  },
-  cardMeta: {
-    color: colors.muted2,
-    fontSize: 10,
-    textAlign: "center",
-  },
-  cardCond: {
-    color: colors.pikachu,
-    fontSize: 10,
-    fontWeight: "700",
-    textAlign: "center",
-    marginTop: 2,
+  blueLabel: {
+    color: colors.onSecondary,
+    fontFamily: fonts.headline,
+    fontSize: 14,
   },
 });
